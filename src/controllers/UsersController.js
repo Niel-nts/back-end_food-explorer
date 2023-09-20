@@ -7,8 +7,6 @@ class UsersController {
 
         const database = await sqliteConnection()
         
-        const user = await database.get("select * from users where id = (?)", [id])
-        
         const checkUserExists = await database.get('select * from users where email = (?)', [email])
 
         if(checkUserExists){
@@ -17,7 +15,7 @@ class UsersController {
 
         const hashedPassword = await hash(password, 8)
 
-        await database.run("insert into users (name, email, password) values (?, ?, ?)", [name, email, password])
+        await database.run("insert into users (name, email, password) values (?, ?, ?)", [name, email, hashedPassword])
 
         return response.status(201).json()
     }
@@ -50,6 +48,7 @@ class UsersController {
             const checkOldPassword = await compare(old_password, user.password)
 
             if(!checkOldPassword){
+                console.log(user.password == old_password)
                 throw new AppError("A senha antiga não confere")
             }
 
@@ -57,11 +56,11 @@ class UsersController {
         }
 
         await database.run(`
-            updata users set 
+            update users set 
             name = ?,
             email = ?,
             password = ?,
-            update_at = datetime('now')
+            updated_at = datetime('now')
             where id = ?`,
             [user.name, user.email, user.password, id]
         )
