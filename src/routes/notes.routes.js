@@ -9,7 +9,7 @@ function myMiddleware(request, response, next){
 }
 
 notesRoutes.use(ensureAuthenticated)
-notesRoutes.post("/:user_id", notesController.create)
+notesRoutes.post("/", notesController.create)
 notesRoutes.get("/", notesController.index)
 notesRoutes.get("/:id", notesController.show)
 notesRoutes.delete("/:id", notesController.delete)
