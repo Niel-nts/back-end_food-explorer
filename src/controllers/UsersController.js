@@ -3,7 +3,7 @@ const AppError = require("../utils/AppError")
 const sqliteConnection = require("../database/sqlite")
 class UsersController {
     async create(request, response){
-        const { name, email, password } = request.body;
+        const { name, email, password, isAdmin } = request.body;
 
         const database = await sqliteConnection()
         
@@ -15,7 +15,7 @@ class UsersController {
 
         const hashedPassword = await hash(password, 8)
 
-        await database.run("insert into users (name, email, password) values (?, ?, ?)", [name, email, hashedPassword])
+        await database.run("insert into users (name, email, password, isAdmin) values (?, ?, ?, ?)", [name, email, hashedPassword, isAdmin])
 
         return response.status(201).json()
     }
@@ -48,7 +48,6 @@ class UsersController {
             const checkOldPassword = await compare(old_password, user.password)
 
             if(!checkOldPassword){
-                console.log(user.password == old_password)
                 throw new AppError("A senha antiga não confere")
             }
 
