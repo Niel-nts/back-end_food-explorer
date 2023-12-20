@@ -79,36 +79,11 @@ class MenusController{
     }
 
     async index(request, response){
-        const {title, tags} = request.query
-        const user_id = request.user.id
-        let menus
+        const {title} = request.query
 
-        if(tags){
-            const filterTags = tags.split(',').map(tag => tag.trim())
-
-            menus = await knex("tags")
-            .select(["menus.id", "menus.title", "menus.user_id"])
-            .where("menus.user_id", user_id)
-            .whereLike("menus.title", `%${title}%`)
-            .whereIn("name", filterTags)
-            .innerJoin("menus", "menus.id", "tags.menu_id")
-            .orderBy("menus.title")
-        } else {
-            menus = await knex("menus").where({user_id}).whereLike("title", `%${title}`).orderBy("title")
-        }
-
-        const userTags = await knex("tags").where({user_id})
-        const menusWithTags = menus.map(menu => {
-            const menuTags = userTags.filter(tag => tag.menu_id === menu.id)
-
-            return {
-                ...menu, 
-                tags: menuTags
-            }
-        })
-
-
-        return response.json(menusWithTags)
+        const menus = await knex("menus").where('menus.title', 'like', `%${title}%`)
+        
+        return response.json(menus)
     }
 
     async update(request, response){
